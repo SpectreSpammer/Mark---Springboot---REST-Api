@@ -17,7 +17,7 @@ import com.onepieceofjava.SpringRestApiDemo.model.Asset;
 import com.onepieceofjava.SpringRestApiDemo.model.Employee;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/old/inventory")
 public class OldInventoryController {
 	
 	private List<Employee> employees = new ArrayList<>();
