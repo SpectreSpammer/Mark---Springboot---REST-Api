@@ -1,4 +1,4 @@
-package com.onepieceofjava.SpringRestApiDemo.controller;
+package com.onepieceofjava.SpringRestApiDemo.oldCodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.onepieceofjava.SpringRestApiDemo.model.Asset;
-import com.onepieceofjava.SpringRestApiDemo.model.Employee;
-
 @RestController
 @RequestMapping("/api/old/inventory")
 public class OldInventoryController {
 	
-	private List<Employee> employees = new ArrayList<>();
+	private List<OldEmployee> employees = new ArrayList<>();
 	
-	private List<Asset> assets = new ArrayList<>();
+	private List<OldAsset> assets = new ArrayList<>();
 	
 	private Long employeeId = 101L;
 	
@@ -31,13 +28,13 @@ public class OldInventoryController {
 	//For employees
 	//get All
 	@GetMapping("employees")
-	public List<Employee> getAllEmployees(){
+	public List<OldEmployee> getAllEmployees(){
 		return employees;
 	}
 	
 	//get by Id
 	@GetMapping("employees/{id}")
-	public Employee getEmployeeById(@PathVariable Long id) {
+	public OldEmployee getEmployeeById(@PathVariable Long id) {
 		return employees.stream()
 				.filter(emp -> emp.getId().equals(id))
 				.findFirst()
@@ -47,13 +44,13 @@ public class OldInventoryController {
 	//Adding of employees
 	
 	@PostMapping("/employees")
-	public Employee addEmployee(@RequestBody Employee employee) {
+	public OldEmployee addEmployee(@RequestBody OldEmployee employee) {
 		
 		employee.setId(employeeId++);
 		
 		if(employee.getAssets() != null && !employee.getAssets().isEmpty()) {
-			List<Asset> processedAssets = new ArrayList<>();
-			for( Asset asset : employee.getAssets()) {
+			List<OldAsset> processedAssets = new ArrayList<>();
+			for( OldAsset asset : employee.getAssets()) {
 				asset.setId(assetId);
 				assets.add(asset);
 				processedAssets.add(asset);
@@ -67,7 +64,7 @@ public class OldInventoryController {
 	}
 	
     @PutMapping("/employees/{id}")
-    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
+    public OldEmployee updateEmployee(@PathVariable Long id, @RequestBody OldEmployee updatedEmployee) {
         for (int i = 0; i < employees.size(); i++) {
             if (employees.get(i).getId().equals(id)) {
                 updatedEmployee.setId(id);
@@ -88,14 +85,14 @@ public class OldInventoryController {
     //Get all Assets
     //http://localhost:9095/api/inventory/assets
 	@GetMapping("/assets")
-	public List<Asset> getAllAssets(){
+	public List<OldAsset> getAllAssets(){
 		return assets;
 	}
 	
 	//Add Assets
 	//http://localhost:9095/api/inventory/assets
 	@PostMapping("/assets")
-	public Asset addAsset(@RequestBody Asset asset) {
+	public OldAsset addAsset(@RequestBody OldAsset asset) {
 		asset.setId(assetId++);
 		assets.add(asset);
 		
@@ -106,32 +103,32 @@ public class OldInventoryController {
 	//Get asset by specific employee
 	//http://localhost:9095/api/inventory/employees/101/assets
 	@GetMapping("/employees/{employeeId}/assets")
-	public List<Asset> getEmployeeAssetsByEmployeeId(@PathVariable Long employeeId){
+	public List<OldAsset> getEmployeeAssetsByEmployeeId(@PathVariable Long employeeId){
 		
-		Optional<Employee> emp = employees.stream()
+		Optional<OldEmployee> emp = employees.stream()
 				.filter(empl -> empl.getId()
 				.equals(employeeId)).findFirst();
 
 		
-		return emp.map(Employee::getAssets).orElse(null);
+		return emp.map(OldEmployee::getAssets).orElse(null);
 	}
 	
 	//Add asset by specific employee
 	//http://localhost:9095/api/inventory/employees/102/assets/202
 	@PostMapping("/employees/{employeeId}/assets/{assetId}")
-	public Employee assignAssetToSpecificEmployee(@PathVariable Long employeeId,@PathVariable Long assetId) {
+	public OldEmployee assignAssetToSpecificEmployee(@PathVariable Long employeeId,@PathVariable Long assetId) {
 		
-		Optional<Employee> emp = employees.stream()
+		Optional<OldEmployee> emp = employees.stream()
 								.filter(empl -> empl.getId()
 								.equals(employeeId)).findFirst();
 		
-		Optional<Asset> ast = assets.stream()
+		Optional<OldAsset> ast = assets.stream()
 				.filter(asts -> asts.getId()
 				.equals(assetId)).findFirst();
 		
 		if(emp.isPresent() && ast.isPresent()) {
-			Employee employee = emp.get();
-			Asset asset = ast.get();
+			OldEmployee employee = emp.get();
+			OldAsset asset = ast.get();
 			employee.addAsset(asset);
 			return employee;
 		}
@@ -142,20 +139,20 @@ public class OldInventoryController {
 	//Delete specific asset from the employee
 	//http:localhost:8080/api/inventory/employees/101/assets/201
 	@DeleteMapping("/employees/{employeeId}/assets/{assetId}")
-	public Employee removeAssetFromEmployee(@PathVariable Long employeeId, @PathVariable Long assetId) {
+	public OldEmployee removeAssetFromEmployee(@PathVariable Long employeeId, @PathVariable Long assetId) {
 		
-		Optional<Employee> emp = employees.stream()
+		Optional<OldEmployee> emp = employees.stream()
 				.filter(empl -> empl.getId()
 				.equals(employeeId)).findFirst();
 
-		Optional<Asset> ast = assets.stream()
+		Optional<OldAsset> ast = assets.stream()
 				.filter(asts -> asts.getId()
 				.equals(assetId)).findFirst();
 		
 		
 		if(emp.isPresent() && ast.isPresent()) {
-			Employee employee = emp.get();
-			Asset asset = ast.get();
+			OldEmployee employee = emp.get();
+			OldAsset asset = ast.get();
 			employee.removeAsset(asset);
 			return employee;
 		}

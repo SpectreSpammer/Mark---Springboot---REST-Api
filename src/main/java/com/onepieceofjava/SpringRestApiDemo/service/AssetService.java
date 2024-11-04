@@ -1,58 +1,50 @@
 package com.onepieceofjava.SpringRestApiDemo.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.onepieceofjava.SpringRestApiDemo.model.Asset;
-import com.onepieceofjava.SpringRestApiDemo.model.Employee;
+import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldAsset;
+import com.onepieceofjava.SpringRestApiDemo.repository.AssetRepository;
 
 @Service
 public class AssetService {
+
+	@Autowired
+	private AssetRepository assetRepository;
 	
-	List<Asset> assets = new ArrayList<>();
-	
-	private Long assetId = 201L;
-	
-	//Get All
+	//getAll
 	public List<Asset> getAllAsset(){
-		return assets;
+		return assetRepository.findAll();
 	}
 	
-	//Get by Id
+	//get by id
 	public Optional<Asset> getAssetById(Long id){
 		
-		return assets.stream().filter(asset -> asset.getId().equals(id)).findFirst();
+		return assetRepository.findById(id);
 	}
 	
 	
-	//Add Assets
+	//add 
 	public Asset addAsset(Asset asset) {
-		asset.setId(assetId++);
-		assets.add(asset);
-		
-		return asset;
+		return assetRepository.save(asset);
 	}
 	
-	
-	//Update Assets
+	//update
 	public Asset updatedAsset(Long id, Asset updatedAsset) {
-		
-		Optional<Asset> assetOptional = getAssetById(id);
-		if(assetOptional.isPresent()) {
+		if(assetRepository.existsById(id)) {
 			updatedAsset.setId(id);
-			assets.set(assets.indexOf(assetOptional), updatedAsset);
-			return updatedAsset;
+			return  assetRepository.save(updatedAsset);
 		}
 		
 		return null;
 	}
 	
-	//Delete Asset by id
+	//delete
 	public void deleteAssetById(Long id) {
-		assets.removeIf(asset -> asset.getId().equals(id));
+		assetRepository.deleteById(id);
 	}
-
 }

@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.onepieceofjava.SpringRestApiDemo.model.Asset;
 import com.onepieceofjava.SpringRestApiDemo.model.Employee;
+import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldAsset;
+import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldAssetService;
+import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldEmployee;
+import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldEmployeeService;
 import com.onepieceofjava.SpringRestApiDemo.service.AssetService;
 import com.onepieceofjava.SpringRestApiDemo.service.EmployeeService;
 
@@ -35,7 +39,7 @@ public class InventoryController {
 	//GET ALL
 	@GetMapping("/employees")
 	public List<Employee> getAllEmployees(){
-		return employeeService.getAllEmployees();
+		return employeeService.getAllEmployee();
 	}
 	
 	//GET by Id
@@ -54,7 +58,7 @@ public class InventoryController {
 	//UPDATE
 	@PutMapping("/employees/{id}")
 	public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
-		return employeeService.updateEmployee(id, updatedEmployee);
+		return employeeService.updatedEmployee(id, updatedEmployee);
 	}
 	
 	//DELETE
