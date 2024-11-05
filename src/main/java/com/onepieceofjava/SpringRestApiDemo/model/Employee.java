@@ -83,10 +83,12 @@ public class Employee {
 	}
 	
 	public void addAsset(Asset asset) {
-		this.assets.add(asset);
-	}
-	
-	public void removeAsset(Asset asset) {
-		this.assets.remove(asset);
-	}
+        assets.add(asset);
+        asset.setEmployee(this);  // Set the back reference
+    }
+    
+    public void removeAsset(Asset asset) {
+        assets.remove(asset);
+        asset.setEmployee(null);  // Remove the back reference
+    }
 }

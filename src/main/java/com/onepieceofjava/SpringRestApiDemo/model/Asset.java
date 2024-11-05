@@ -37,7 +37,7 @@ public class Asset {
 	}
 
 	public Asset(Long id, String name, String type, String serialNumber) {
-		super();
+		
 		this.id = id;
 		this.name = name;
 		this.type = type;
@@ -75,4 +75,8 @@ public class Asset {
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
 	}
+	
+	public void setEmployee(Employee employee) {
+	        this.employee = employee;
+	 }
 }

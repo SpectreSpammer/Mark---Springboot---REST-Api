@@ -10,6 +10,8 @@ import com.onepieceofjava.SpringRestApiDemo.model.Asset;
 import com.onepieceofjava.SpringRestApiDemo.model.Employee;
 import com.onepieceofjava.SpringRestApiDemo.repository.EmployeeRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class EmployeeService {
 	
@@ -34,6 +36,11 @@ public class EmployeeService {
 	public Employee addEmployee(Employee employee) {
 			return employeeRepository.save(employee);
 	}
+	
+	@Transactional
+    public Employee saveEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
 		
 	//update
 	public Employee updatedEmployee(Long id, Employee updatedEmployee) {

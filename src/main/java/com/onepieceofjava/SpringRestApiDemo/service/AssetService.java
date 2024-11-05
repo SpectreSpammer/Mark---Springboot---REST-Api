@@ -10,6 +10,8 @@ import com.onepieceofjava.SpringRestApiDemo.model.Asset;
 import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldAsset;
 import com.onepieceofjava.SpringRestApiDemo.repository.AssetRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AssetService {
 
@@ -32,6 +34,11 @@ public class AssetService {
 	public Asset addAsset(Asset asset) {
 		return assetRepository.save(asset);
 	}
+	
+	 @Transactional
+	 public Asset saveAsset(Asset asset) {
+	    return assetRepository.save(asset);
+	 }
 	
 	//update
 	public Asset updatedAsset(Long id, Asset updatedAsset) {

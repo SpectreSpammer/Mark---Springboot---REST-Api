@@ -103,18 +103,25 @@ public class InventoryController {
 	
 	//For assigning assets to the employee
 	@PostMapping("/employees/{employeeId}/assets/{assetId}")
-	public Employee assignAssetToTheEmployee(@PathVariable Long employeeId,@PathVariable Long assetId) {
-		
-		Optional<Employee> employeeOptional = employeeService.getEmployeeById(employeeId);
-		Optional<Asset> assetOptional = assetService.getAssetById(assetId);
-		
-		
-		if(employeeOptional.isPresent() && assetOptional.isPresent()) {
-			Employee employee = employeeOptional.get();
-			employee.addAsset(assetOptional.get());
-			return employee;
-		}
-		return null;
+	public Employee assignAssetToTheEmployee(@PathVariable Long employeeId, @PathVariable Long assetId) {
+	    Optional<Employee> employeeOptional = employeeService.getEmployeeById(employeeId);
+	    Optional<Asset> assetOptional = assetService.getAssetById(assetId);
+	    
+	    if(employeeOptional.isPresent() && assetOptional.isPresent()) {
+	        Employee employee = employeeOptional.get();
+	        Asset asset = assetOptional.get();
+	        
+	        // Set the relationship on both sides
+	        asset.setEmployee(employee);
+	        employee.addAsset(asset);
+	        
+	        // Save the updated asset
+	        assetService.addAsset(asset);
+	        
+	        // Save and return the updated employee
+	        return employeeService.addEmployee(employee);
+	    }
+	    return null;
 	}
 	
 	
