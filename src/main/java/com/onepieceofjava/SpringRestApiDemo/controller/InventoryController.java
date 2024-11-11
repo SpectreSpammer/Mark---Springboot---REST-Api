@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,10 +52,33 @@ public class InventoryController {
 	}
 	
 	//ADD
-	@PostMapping("/employees")
-	public Employee addEmployee(@RequestBody Employee employee) {
-		return employeeService.addEmployee(employee);
-	}
+    @PostMapping("/employees")
+    public ResponseEntity<?> addEmployee(@RequestBody Employee employee) {
+        try {
+            if (employee.getName() == null || employee.getName().trim().isEmpty()) {
+                return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Employee name cannot be null");
+            }
+            
+            if (employee.getDepartment() == null || employee.getDepartment().trim().isEmpty()) {
+                return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Department cannot be null");
+            }
+            
+            Employee savedEmployee = employeeService.addEmployee(employee);
+            return ResponseEntity.ok(savedEmployee);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(e.getMessage());
+        }
+    }
 	
 	//UPDATE
 	@PutMapping("/employees/{id}")
