@@ -11,12 +11,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
 
 
 
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,22 +102,6 @@ public class InventoryControllerIntegrationTesting {
 		
 	}
 	
-	//Get employee by asset
-	@Test
-	void getEmployeeAsset_ShouldReturnListOfAssets() throws Exception {
-		
-		//Arrange
-		testEmployee.addAsset(testAsset);
-		when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(testEmployee));
-		
-		
-		//Act and Assert
-		mockMvc.perform(get("/api/inventory/employees/1/assets"))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$", hasSize(1)))
-		.andExpect(jsonPath("$[0].name").value(testAsset.getName()));
-	}
-	
 	//Add
     @Test
     void addEmployee_ShouldReturnCreatedEmployee() throws Exception {
@@ -169,15 +158,191 @@ public class InventoryControllerIntegrationTesting {
         .andExpect(jsonPath("$.name").value("Nan"))
         .andExpect(jsonPath("$.department").value("Sales"));
     	
-    	  verify(employeeService, times(1)).addEmployee(any(Employee.class));
+    	 verify(employeeService, times(1)).addEmployee(any(Employee.class));
     }
+    
+    
 	//Delete
+    @Test
+    void deleteEmployee_ShouldDeleteEmployee() throws Exception{
+    	
+    	//Arrange
+    	Long employeeId = 1L;
+    	Employee deleteExistingEmployee = new Employee(employeeId,"Nan","Sales");
+    	when(employeeService.getEmployeeById(employeeId)).thenReturn(Optional.of(testEmployee));
+    	doNothing().when(employeeService).deleteEmployeeById(employeeId);
+    	
+    	//Act and Assert
+    	mockMvc.perform(delete("/api/inventory/employees/{id}",employeeId))
+    	.andExpect(status().isNoContent());
+    	
+    	verify(employeeService,times(1)).deleteEmployeeById(employeeId);
+    }
+	
+	//Update
+    @Test
+    void updateEmployee_ShouldReturnUpdatedEmployee() throws Exception{
+    	
+    	//Arrange
+    	Long employeeId = 1L;
+    	Employee updateEmployee = new Employee(null,"Nan","Sales");
+    	Employee savedEmployee = new Employee(employeeId,"Nan","Sales");
+    	when(employeeService.updatedEmployee(eq(employeeId), any(Employee.class)))
+    	.thenReturn(savedEmployee);
+    	
+    	
+    	//Act and Assert
+    	mockMvc.perform(put("/api/inventory/employees/{id}",employeeId)
+    	    	.contentType(MediaType.APPLICATION_JSON)
+    	        .content(objectMapper.writeValueAsString(updateEmployee)))
+    	    	.andExpect(status().isOk())
+    	    	.andExpect(jsonPath("$.id").value(employeeId))
+    	        .andExpect(jsonPath("$.name").value("Nan"))
+    	        .andExpect(jsonPath("$.department").value("Sales"))
+		        .andExpect(jsonPath("$.assets").isArray())
+		        .andExpect(jsonPath("$.assets").isEmpty());
+    	
+    	verify(employeeService, times(1)).updatedEmployee(eq(employeeId), any(Employee.class));
+    }
+    
+    @Test
+    void updateEmployee_WithNullName_ShouldReturnBadRequest() throws Exception{
+    	
+    	//Arrange
+    	Long employeeId = 1L;
+    	Employee invalidEmployee = new Employee(null,null,"Sales");
+    	
+    	
+    	//Act and assert
+    	mockMvc.perform(put("/api/inventory/employees/{id}",employeeId)
+    	    	.contentType(MediaType.APPLICATION_JSON)
+    	        .content(objectMapper.writeValueAsString(invalidEmployee)))
+    	    	.andExpect(status().isBadRequest());
+    	    	
+    	verify(employeeService, never()).updatedEmployee(any(Long.class), any(Employee.class));
+    }
+    
+    @Test
+    void updateEmployee_WithNullDepartment_ShouldReturnBadRequest() throws Exception{
+    	
+    	//Arrange
+    	Long employeeId = 1L;
+    	Employee invalidEmployee = new Employee(null,"Nan",null);
+    	
+    	
+    	//Act and assert
+    	mockMvc.perform(put("/api/inventory/employees/{id}",employeeId)
+    	    	.contentType(MediaType.APPLICATION_JSON)
+    	        .content(objectMapper.writeValueAsString(invalidEmployee)))
+    	    	.andExpect(status().isBadRequest());
+    	    	
+    	verify(employeeService, never()).updatedEmployee(any(Long.class), any(Employee.class));
+    }
+    
+    
+    @Test
+    void updateEmployee_WithInvalidId_ShouldReturnBadRequest()throws Exception {
+    	//Arrange
+    	String invalidEmployeeId = "12345ASD";
+    
+    	
+    	
+    	//Act and assert
+    	mockMvc.perform(put("/api/inventory/employees/{id}",invalidEmployeeId)
+    	    	.contentType(MediaType.APPLICATION_JSON)
+    	        .content(objectMapper.writeValueAsString(testEmployee)))
+    	    	.andExpect(status().isBadRequest());
+    	    	
+    	verify(employeeService, never()).updatedEmployee(anyLong(), any(Employee.class));
+    }
+    
+    @Test
+    void updateEmployee_WhenEmployeeNotFound_ShouldReturnNotFound() throws Exception {
+    	
+    	//Arrange
+    	Long employeeId = 999L;
+    	Employee updateEmployee = new Employee(null,"Nan","Sales");
+    	
+    	when(employeeService.updatedEmployee(eq(employeeId), any(Employee.class)))
+    	.thenThrow(new IllegalArgumentException("Employee with id " + employeeId + "not found.!"));
+    	
+    	//Act and Assert
+    	mockMvc.perform(put("/api/inventory/employees/{id}",employeeId)
+    	    	.contentType(MediaType.APPLICATION_JSON)
+    	        .content(objectMapper.writeValueAsString(updateEmployee)))
+    	    	.andExpect(status().isNotFound());
+    	
+    	verify(employeeService, times(1)).updatedEmployee(eq(employeeId), any(Employee.class));
+    }
+    
+	
+	//Asset
+	//Get employee by asset
+	@Test
+	void getEmployeeAsset_ShouldReturnListOfAssets() throws Exception {
+		
+		//Arrange
+		testEmployee.addAsset(testAsset);
+		when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(testEmployee));
+		
+		
+		//Act and Assert
+		mockMvc.perform(get("/api/inventory/employees/1/assets"))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$", hasSize(1)))
+		.andExpect(jsonPath("$[0].name").value(testAsset.getName()));
+	}
+	
+	//GET By Id
+	@Test
+	void getAssetById_ShouldReturnAssets()  throws Exception{
+		
+		//Arrange
+		Long assetId = 201L;
+		Asset testAsset = new Asset(assetId,"Lenovo","Developer Laptop","LNV10123");
+		
+		when(assetService.getAssetById(assetId)).thenReturn(Optional.of(testAsset));
+		
+	
+		//Act and Assert
+		mockMvc.perform(get("/api/inventory/assets/{id}",assetId))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.id").value(assetId))
+        .andExpect(jsonPath("$.name").value("Lenovo"))
+        .andExpect(jsonPath("$.type").value("Developer Laptop"))
+        .andExpect(jsonPath("$.serialNumber").value("LNV10123"));
+		
+		verify(assetService,times(1)).getAssetById(assetId);
+        
+	}
+	//Add
+	@Test
+	void addAsset_ShouldReturnAddAsset()  throws Exception{
+		
+		//Arrange
+		Asset newAsset = new Asset(null,"Lenovo","Developer Laptop","LNV10123");
+		Asset savedAsset = new Asset(202L,"Lenovo","Developer Laptop","LNV10123");
+		
+		when(assetService.addAsset(any(Asset.class))).thenReturn(savedAsset);
+		
+		//Act and  Assert
+		mockMvc.perform(post("/api/inventory/assets")
+				.contentType(MediaType.APPLICATION_JSON)
+    	        .content(objectMapper.writeValueAsString(newAsset)))	
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(savedAsset.getId()))
+		        .andExpect(jsonPath("$.name").value("Lenovo"))
+		        .andExpect(jsonPath("$.type").value("Developer Laptop"))
+		        .andExpect(jsonPath("$.serialNumber").value("LNV10123"));
+		
+		verify(assetService,times(1)).addAsset(any(Asset.class));
+	}
 	
 	//Update
 	
-	//Asset
+	//Delete
 	
-	//
+	
 	
 
 }

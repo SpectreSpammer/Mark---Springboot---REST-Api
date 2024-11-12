@@ -82,14 +82,43 @@ public class InventoryController {
 	
 	//UPDATE
 	@PutMapping("/employees/{id}")
-	public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
-		return employeeService.updatedEmployee(id, updatedEmployee);
+	public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
+		try {
+			if(updatedEmployee.getName() == null || updatedEmployee.getName().trim().isEmpty()){
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Employee name cannot be null.!");
+			}
+			
+			if(updatedEmployee.getDepartment() == null || updatedEmployee.getDepartment().trim().isEmpty()){
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Department cannot be null.!");
+			}
+			
+			
+			
+			Employee updated = employeeService.updatedEmployee(id, updatedEmployee);
+			return ResponseEntity.ok(updated);
+			
+		}catch(IllegalArgumentException e) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
+		}catch(RuntimeException e) {
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(e.getMessage());
+		}
+		
+		
 	}
 	
 	//DELETE
 	@DeleteMapping("/employees/{id}")
-	public void deleteEmployeeById(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id) {
 		employeeService.deleteEmployeeById(id);
+		return ResponseEntity.noContent().build();
 	}
 	
 	
@@ -121,8 +150,9 @@ public class InventoryController {
 	
 	//DELETE
 	@DeleteMapping("/assets/{id}")
-	public void deleteAsset(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteAsset(@PathVariable Long id) {
 		assetService.deleteAssetById(id);
+		return ResponseEntity.noContent().build();
 	}
 	
 	
