@@ -337,11 +337,127 @@ public class InventoryControllerIntegrationTesting {
 		
 		verify(assetService,times(1)).addAsset(any(Asset.class));
 	}
-	
-	//Update
-	
+
+	//Update -> validate invalid id ( 123abc )
+	@Test
+	void updateAsset_WithInvalidId_ShouldReturnBadRequest() throws Exception{
+		//Arrange
+		String invalidAssetId = "123abc";
+
+		//Act and Assert
+		mockMvc.perform(put("/api/inventory/assets/{id}",invalidAssetId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(testAsset)))
+				.andExpect(status().isBadRequest());
+
+		verify(assetService,never()).updatedAsset(any(Long.class),any(Asset.class));
+	}
+
+
+	//Update -> validate null asset id
+	/*
+	@Test
+	void updateAsset_withNullAssetId_ShouldReturnBadRequest() throws Exception{
+		//Arrange
+		Long assetId = 2L;
+		Asset invalidAsset =  new Asset(null,"Lenovo","HR Laptop","abc123");
+
+		//Act and Assert
+		mockMvc.perform(put("/api/inventory/assets/{id}",assetId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(invalidAsset)))
+				.andExpect(status().isBadRequest());
+
+		verify(assetService,never()).updatedAsset(any(Long.class),any(Asset.class));
+
+	}
+	*/
+
+	//Update -> validate null asset name
+	@Test
+	void updateAsset_withNullAssetName_ShouldReturnBadRequest() throws Exception{
+		//Arrange
+		Long assetId = 2L;
+		Asset invalidAsset =  new Asset(null,null,"HR Laptop","abc123");
+
+		//Act and Assert
+		mockMvc.perform(put("/api/inventory/assets/{id}",assetId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(invalidAsset)))
+						.andExpect(status().isBadRequest());
+
+		verify(assetService,never()).updatedAsset(any(Long.class),any(Asset.class));
+	}
+
+	//Update -> validate null asset type
+	@Test
+	void updateAsset_withNullAssetType_ShouldReturnBadRequest() throws Exception{
+		//Arrange
+		Long assetId = 2L;
+		Asset invalidAsset =  new Asset(null,"Lenovo",null,"abc123");
+
+		//Act and Assert
+		mockMvc.perform(put("/api/inventory/assets/{id}",assetId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(invalidAsset)))
+				.andExpect(status().isBadRequest());
+
+		verify(assetService,never()).updatedAsset(any(Long.class),any(Asset.class));
+	}
+
+	//Update -> validate null serial number
+	@Test
+	void updateAsset_withNullSerialNumber_ShouldReturnBadRequest() throws Exception{
+		//Arrange
+		Long assetId = 2L;
+		Asset invalidAsset =  new Asset(null,"Lenovo","HR",null);
+
+		//Act and Assert
+		mockMvc.perform(put("/api/inventory/assets/{id}",assetId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(invalidAsset)))
+				.andExpect(status().isBadRequest());
+
+		verify(assetService,never()).updatedAsset(any(Long.class),any(Asset.class));
+	}
+
+	//Update -> asset when not found
+	/*
+	@Test
+	void updateAsset_WhenAssetNotFound_ShouldReturnNotFound() throws Exception {
+		// Arrange
+		Long assetId = 999L;
+		Asset updatedAsset = new Asset(null, "Dell", "HR laptop", "SN123");
+
+		when(assetService.updatedAsset(eq(assetId), any(Asset.class)))
+				.thenThrow(new IllegalArgumentException("Asset with id " + assetId + " not found!"));
+
+		// Act and Assert
+		mockMvc.perform(put("/api/inventory/assets/{id}", assetId)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(updatedAsset)))
+				.andExpect(status().isNotFound());
+
+		verify(assetService, times(1)).updatedAsset(eq(assetId), any(Asset.class));
+	}
+	*/
+
+
 	//Delete
-	
+	@Test
+	void deleteAsset_ShouldReturnNoContent() throws  Exception {
+		//Arrange
+		Long assetId = 1L;
+		doNothing().when(assetService).deleteAssetById(assetId);
+
+		//Act and Assert
+		mockMvc.perform(delete("/api/inventory/assets/{id}",assetId))
+					.andExpect(status().isNoContent())
+					.andExpect(content().string(""));
+
+
+		verify(assetService,times(1)).deleteAssetById(assetId);
+	}
 	
 	
 

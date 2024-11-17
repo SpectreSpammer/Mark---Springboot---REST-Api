@@ -144,8 +144,45 @@ public class InventoryController {
 	
 	//UPDATE
 	@PutMapping("/assets/{id}")
-	public Asset updateAsset(@PathVariable Long id, @RequestBody Asset updatedAsset) {
-		return assetService.updatedAsset(id, updatedAsset);
+	public ResponseEntity<?> updateAsset(@PathVariable Long id, @RequestBody Asset updatedAsset) {
+		try {
+
+
+
+			// Validate name
+			if (updatedAsset.getName() == null || updatedAsset.getName().trim().isEmpty()) {
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Asset name cannot be null or empty");
+			}
+
+			// Validate type
+			if (updatedAsset.getType() == null || updatedAsset.getType().trim().isEmpty()) {
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Asset type cannot be null or empty");
+			}
+
+			// Validate serialNumber
+			if (updatedAsset.getSerialNumber() == null || updatedAsset.getSerialNumber().trim().isEmpty()) {
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Serial number cannot be null or empty");
+			}
+
+			Asset updated = assetService.updatedAsset(id, updatedAsset);
+			return ResponseEntity.ok(updated);
+
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(e.getMessage());
+
+		} catch (RuntimeException e) {
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(e.getMessage());
+		}
 	}
 	
 	//DELETE
