@@ -355,23 +355,21 @@ public class InventoryControllerIntegrationTesting {
 
 
 	//Update -> validate null asset id
-	/*
+	//to be discussed on next meeting
 	@Test
-	void updateAsset_withNullAssetId_ShouldReturnBadRequest() throws Exception{
+	void updateAsset_withNullId_ShouldReturnBadRequest() throws Exception {
 		//Arrange
-		Long assetId = 2L;
-		Asset invalidAsset =  new Asset(null,"Lenovo","HR Laptop","abc123");
+		Asset validAsset = new Asset(null, "Lenovo", "HR Laptop", "abc123");
 
 		//Act and Assert
-		mockMvc.perform(put("/api/inventory/assets/{id}",assetId)
+		mockMvc.perform(put("/api/inventory/assets/null")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(invalidAsset)))
+						.content(objectMapper.writeValueAsString(validAsset)))
 				.andExpect(status().isBadRequest());
 
-		verify(assetService,never()).updatedAsset(any(Long.class),any(Asset.class));
-
+		verify(assetService, never()).updatedAsset(any(Long.class), any(Asset.class));
 	}
-	*/
+
 
 	//Update -> validate null asset name
 	@Test
