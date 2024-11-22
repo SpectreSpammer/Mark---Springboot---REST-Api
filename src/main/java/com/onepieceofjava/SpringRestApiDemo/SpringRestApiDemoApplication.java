@@ -10,10 +10,21 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = {
 		"com.onepieceofjava.SpringRestApiDemo.controller",
 		"com.onepieceofjava.SpringRestApiDemo.service",
-		"com.onepieceofjava.SpringRestApiDemo.repository"
+		"com.onepieceofjava.SpringRestApiDemo.repository",
+		"com.onepieceofjava.SpringRestApiDemo.security.config",
+		"com.onepieceofjava.SpringRestApiDemo.security.service",
+		"com.onepieceofjava.SpringRestApiDemo.security.repository",
+		"com.onepieceofjava.SpringRestApiDemo.security.init"
 })
-@EntityScan("com.onepieceofjava.SpringRestApiDemo.model")
-@EnableJpaRepositories("com.onepieceofjava.SpringRestApiDemo.repository")
+@EntityScan({
+		"com.onepieceofjava.SpringRestApiDemo.model",
+		"com.onepieceofjava.SpringRestApiDemo.security.model"
+})
+
+@EnableJpaRepositories({
+		"com.onepieceofjava.SpringRestApiDemo.repository",
+		"com.onepieceofjava.SpringRestApiDemo.security.repository"
+})
 public class SpringRestApiDemoApplication {
 
 	public static void main(String[] args) {

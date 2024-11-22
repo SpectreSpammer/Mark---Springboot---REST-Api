@@ -147,7 +147,12 @@ public class InventoryController {
 	public ResponseEntity<?> updateAsset(@PathVariable Long id, @RequestBody Asset updatedAsset) {
 		try {
 
-
+			//validate id
+			if (updatedAsset.getId() == null) {
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Asset name cannot be null or empty");
+			}
 
 			// Validate name
 			if (updatedAsset.getName() == null || updatedAsset.getName().trim().isEmpty()) {
