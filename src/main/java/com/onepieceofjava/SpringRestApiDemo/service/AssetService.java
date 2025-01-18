@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.onepieceofjava.SpringRestApiDemo.model.Asset;
-import com.onepieceofjava.SpringRestApiDemo.oldCodes.OldAsset;
 import com.onepieceofjava.SpringRestApiDemo.repository.AssetRepository;
 
 import jakarta.transaction.Transactional;
